@@ -54,19 +54,9 @@ class Grafo:
 			return None
 
 	def dijkstra_relax(self, fila_min_heap:MinHeap,vertice_u: Vertice, vertice_v:Vertice, distancia:Dict[Vertice, DistanciaVerticeOrigem], pai:Dict[Vertice,Vertice]):
-		p = None
-		anterior = None
-		atual = None
-		dist = 0
-		for v in pai.keys():
-			if pai[v] is None:
-				p = v
-				anterior = p
-			else:
-				atual = v
-				ad = anterior.adjacencias
-				dist = dist + ad[v]
-				anterior = v
+		dist = distancia[vertice_u].distancia
+		vert = vertice_u.adjacencias
+		dist = dist + vert[vertice_v]
 		if distancia[vertice_v].distancia > dist:
 			distancia[vertice_v].distancia = dist
 			pai[vertice_v ]= vertice_u
@@ -82,11 +72,28 @@ class Grafo:
 		fila_min_heap = MinHeap()
 		#inicialização 
 		for vertice in self.vertices.values():
-			pass
+			pai[vertice] = None
+			distancia[vertice] = DistanciaVerticeOrigem(vertice, float("inf"))
 		
 		#print(f"HEAP: {fila_min_heap}")
 		#print(f"Vertice Origem: {vertice_origem.valor}")
 
 		#escreva o código abaixo para preencher as veriaveis distancia e pai adequadamente
+		def menor(li, dist):
+			m = dist[li[0]]
+			for i in li:
+				if dist[i] < m:
+					m = dist[i]
+			return m
+		distancia[vertice_origem].distancia = 0
+		Q = []
+		for i in self.vertices.values():
+			Q.append(i)
+		while len(Q) != 0:
+			me = menor(Q, distancia)
+			u = me.vertice
+			Q.remove(u)
+			for v in u.adjacencias.keys():
+				self.dijkstra_relax(fila_min_heap, u, v, distancia, pai)
 
 		return distancia, pai
